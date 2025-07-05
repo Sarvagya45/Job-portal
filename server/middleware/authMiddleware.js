@@ -1,12 +1,12 @@
 import jwt from "jsonwebtoken";
-import Company from "../models/Company";
+import Company from "../models/Company.js";
 
 export const protectCompany = async (req,resp,next) => {
      
     const token = req.header.token
 
     if(!token){
-        return resp.json({success:true, message:"Not Authorised, login again"})
+        return resp.json({success:false, message:"Not Authorised, login again"})
     }
 
     try {

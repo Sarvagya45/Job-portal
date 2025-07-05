@@ -84,12 +84,30 @@ export const getCompanyData = async (req, resp) => {
 //post a new job
 export const postJob = async (req, resp) => {
 
-    const {title, description, location, salary} = req.body
+    const {title, description, location, salary, date, level, category} = req.body
 
     const companyId = req.company._id
 
-    console.log(companyId,{title, description, location, salary})
+    try {
 
+        const newJob = new Job({
+            title,
+            description,
+            location,
+            salary,
+            companyId,
+            date:date.now,
+            level,
+            category
+        })
+
+        await newJob.save()
+        
+        resp.json({success:true, newJob})
+
+    } catch (error) {
+        resp.json({success:false, message:error.message})
+    }
 }
 
 //get company job Application
