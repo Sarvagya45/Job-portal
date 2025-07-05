@@ -1,29 +1,29 @@
 import Company from "../models/Company.js";
 import bcrypt from "bcrypt";
-import {v2 as cloudinary} from 'cloudinary';
+import { v2 as cloudinary } from 'cloudinary';
 import generateToken from "../utils/generateToken.js";
 
 //register a new company
-export const registerCompany = async (req,resp) =>{
+export const registerCompany = async (req, resp) => {
 
-    const{name, email, password} = req.body;
+    const { name, email, password } = req.body;
 
     const imageFile = req.file;
 
-    if( !name || !email || !password || !imageFile){
-        return resp.json({success:false, message:"Missing Details"})
+    if (!name || !email || !password || !imageFile) {
+        return resp.json({ success: false, message: "Missing Details" })
     }
 
     try {
-        
-        const companyExist = await Company.findOne({email})
 
-        if(companyExist){
-            return resp.json({success:false, message:"company already exist"})
+        const companyExist = await Company.findOne({ email })
+
+        if (companyExist) {
+            return resp.json({ success: false, message: "company already exist" })
         }
 
         const salt = await bcrypt.genSalt(10)
-        const hashPassword = await bcrypt.hash(password,salt)
+        const hashPassword = await bcrypt.hash(password, salt)
 
         const imageUpload = await cloudinary.uploader.upload(imageFile.path)
 
@@ -31,55 +31,83 @@ export const registerCompany = async (req,resp) =>{
             name,
             email,
             password: hashPassword,
-            image:imageUpload.secure_url
+            image: imageUpload.secure_url
         })
 
         resp.json({
-            success:true,
-            company:{
-                _id:company._id,
-                name:company.name,
-                email:company.email,
-                image:company.image
+            success: true,
+            company: {
+                _id: company._id,
+                name: company.name,
+                email: company.email,
+                image: company.image
             },
             token: generateToken(company._id)
         })
-    } catch (error){
-        resp.json({success:false,message:error.message})
+    } catch (error) {
+        resp.json({ success: false, message: error.message })
     }
 }
 
 //company login 
-export const loginCompany = async (req,resp) =>{
+export const loginCompany = async (req, resp) => {
+    const { email, password } = req.body;
 
+    try {
+        const company = await Company.findOne({ email })
+
+        if (bcrypt.compare(password, company.password)) {
+            resp.json({
+                success: true,
+                message: {
+                    _id: company._id,
+                    name: company.name,
+                    email: company.email,
+                    image: company.image
+                },
+                token: generateToken(company._id)
+            })
+        }
+        else{
+            resp.json({success:false , message:"invalid email or password"})
+        }
+    } catch (error) {
+        resp.json({success: false , mmessage: error.message})
+    }
 }
 
 //get company data 
-export const getCompanyData = async (req,resp) =>{
+export const getCompanyData = async (req, resp) => {
 
 }
 
 //post a new job
-export const postJob = async (req,resp) =>{
+export const postJob = async (req, resp) => {
+
+    const {title, description, location, salary} = req.body
+
+    const companyId = req.company._id
+
+    console.log(companyId,{title, description, location, salary})
 
 }
 
 //get company job Application
-export const getCompanyJobApplication = async (req,resp) =>{
+export const getCompanyJobApplication = async (req, resp) => {
 
 }
 
 //get company posted job 
-export const getCompanyPostedJobs = async (req,resp) =>{
+export const getCompanyPostedJobs = async (req, resp) => {
 
 }
 
 //change Job application status
-export const changeJobApplicationStatus = async (req,resp) =>{
-     
+export const changeJobApplicationStatus = async (req, resp) => {
+
 }
 
 //change Job visibilty
-export const changeJobVisibility = async (req,resp) =>{
+export const changeJobVisibility = async (req, resp) => {
 
 }
