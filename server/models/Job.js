@@ -9,7 +9,7 @@ const jobSchema = new mongoose.Schema({
     salary:{type:Number, required:true},
     date:{type:Date, default:Date.now},
     visible:{type:Boolean, default:true},
-    company:{type:mongoose.Schema.Types.ObjectId, ref:"Company", required:true},
+    companyId:{type:mongoose.Schema.Types.ObjectId, ref:"Company", required:true},
 })
 
 const Job = mongoose.model('Job',jobSchema)

@@ -100,7 +100,7 @@ export const postJob = async (req, resp) => {
             description,
             location,
             salary,
-            company: req.company._id, 
+            companyId: req.company._id, 
             level,
             category
         })
