@@ -31,7 +31,7 @@ export const getJobById = async (req, resp) =>{
         if(!job){
             return resp.json({success:false, message:"job not found"})
         }
-
+                
         resp.json({success:true, job})
 
     } catch (error) {

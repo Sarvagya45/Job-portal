@@ -81,7 +81,15 @@ export const loginCompany = async (req, resp) => {
 
 //get company data 
 export const getCompanyData = async (req, resp) => {
+    try {
 
+        const company = req.company
+
+        resp.json({ success: true, company })
+
+    } catch (error) {
+        resp.json({ success: false, message: error.message })
+    }
 }
 
 //post a new job
@@ -89,8 +97,8 @@ export const postJob = async (req, resp) => {
 
     const { title, description, location, salary, level, category } = req.body
 
-    if (!title || !description || !location || !salary || !level || !category) { 
-        return resp.json({ success: false, message: "Missing Details" }); 
+    if (!title || !description || !location || !salary || !level || !category) {
+        return resp.json({ success: false, message: "Missing Details" });
     }
 
     try {
@@ -100,7 +108,7 @@ export const postJob = async (req, resp) => {
             description,
             location,
             salary,
-            companyId: req.company._id, 
+            companyId: req.company._id,
             level,
             category
         })
@@ -117,10 +125,25 @@ export const postJob = async (req, resp) => {
 //get company job Application
 export const getCompanyJobApplication = async (req, resp) => {
 
+
 }
 
 //get company posted job 
 export const getCompanyPostedJobs = async (req, resp) => {
+
+    try {
+
+        const companyId = req.company._id
+
+        const jobs = await Job.find({ companyId })
+
+        //(Todo) adding no of applicant info in data
+
+        resp.json({ success: true, jobsData: jobs })
+
+    } catch (error) {
+        resp.json({ success: false, message: error.message })
+    }
 
 }
 
@@ -131,5 +154,24 @@ export const changeJobApplicationStatus = async (req, resp) => {
 
 //change Job visibilty
 export const changeJobVisibility = async (req, resp) => {
+    
+    try {
+        
+        const {id} = req.body
 
+        const companyId = req.company._id
+
+        const job = await Job.findById(id)
+        
+        if( companyId.toString() === job.companyId.toString() ){
+            job.visible = !job.visible
+        }
+
+        await job.save()
+
+        resp.json({success:true, job})
+    } catch (error) {
+        resp.json({success:false, message:error.message})
+    }
+     
 }
