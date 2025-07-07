@@ -57,7 +57,9 @@ export const loginCompany = async (req, resp) => {
     try {
         const company = await Company.findOne({ email })
 
-        if (bcrypt.compare(password, company.password)) {
+        const isPasswordValid = await bcrypt.compare(password, company.password);
+
+        if (isPasswordValid) {
             resp.json({
                 success: true,
                 message: {
@@ -69,11 +71,11 @@ export const loginCompany = async (req, resp) => {
                 token: generateToken(company._id)
             })
         }
-        else{
-            resp.json({success:false , message:"invalid email or password"})
+        else {
+            resp.json({ success: false, message: "invalid email or password" })
         }
     } catch (error) {
-        resp.json({success: false , mmessage: error.message})
+        resp.json({ success: false, message: error.message })
     }
 }
 
@@ -85,9 +87,11 @@ export const getCompanyData = async (req, resp) => {
 //post a new job
 export const postJob = async (req, resp) => {
 
-    const {title, description, location, salary, date, level, category} = req.body
+    const { title, description, location, salary, level, category } = req.body
 
-    const companyId = req.company._id
+    if (!title || !description || !location || !salary || !level || !category) { 
+        return resp.json({ success: false, message: "Missing Details" }); 
+    }
 
     try {
 
@@ -96,18 +100,17 @@ export const postJob = async (req, resp) => {
             description,
             location,
             salary,
-            companyId,
-            date:date.now,
+            company: req.company._id, 
             level,
             category
         })
 
         await newJob.save()
-        
-        resp.json({success:true, newJob})
+
+        resp.json({ success: true, newJob })
 
     } catch (error) {
-        resp.json({success:false, message:error.message})
+        resp.json({ success: false, message: error.message })
     }
 }
 
