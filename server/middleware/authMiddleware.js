@@ -13,7 +13,7 @@ export const protectCompany = async (req, resp, next) => {
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET)
 
-        const company = await Company.findById(decoded.id)
+        const company = await Company.findById(decoded.id).select('-password')
 
         if (!company) {
             return resp.json({ success: false, message: "Not Authorised, company not found" });
