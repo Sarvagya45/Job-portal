@@ -1,5 +1,4 @@
 import Job from "../models/Job.js"
-import Company from "../models/Company.js"
 
 //get all jobs
 export const getJobs = async (req, resp) =>{
@@ -36,47 +35,5 @@ export const getJobById = async (req, resp) =>{
 
     } catch (error) {
         resp.json({success:false,message:"error.message"})
-    }
-}
-
-// Create a new job
-export const createJob = async (req, resp) => {
-    try {
-        const { title, description, location, category, level, salary } = req.body
-
-        // Basic validation
-        if (!title || !description || !location || !category || !level || !salary) {
-            return resp.json({ success: false, message: "All fields are required" })
-        }
-
-        // Check if there's a default company, if not create one
-        let defaultCompany = await Company.findOne({})
-        
-        if (!defaultCompany) {
-            defaultCompany = new Company({
-                name: "Default Company",
-                email: "default@company.com", 
-                image: "default-image-url",
-                password: "defaultpassword123"
-            })
-            await defaultCompany.save()
-        }
-
-        const newJob = new Job({
-            title,
-            description,
-            location,
-            category,
-            level,
-            salary: Number(salary),
-            companyId: defaultCompany._id
-        })
-
-        await newJob.save()
-
-        resp.json({ success: true, message: "Job created successfully", job: newJob })
-
-    } catch (error) {
-        resp.json({ success: false, message: error.message })
     }
 }

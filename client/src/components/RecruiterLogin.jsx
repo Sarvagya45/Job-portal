@@ -21,20 +21,50 @@ const RecruiterLogin = () => {
 
         if (state === "Sign Up" && !isTextDataSubmitted) {
             setIstextDataSubmitted(true)
+            return
         }
 
         try {
             
             if(state === "Login"){
-
-                const {data} = await axios.post(backendUrl + '/api/company/login')
+                const loginData = { email, password }
+                const {data} = await axios.post(backendUrl + '/api/company/login', loginData)
             
                 if(data.success){
-                    console.log(data)
+                    setCompanyToken(data.token)
+                    setCompanyData(data.message)
+                    localStorage.setItem('companyToken', data.token)
+                    setShowRecruiterLogin(false)
+                    alert('Login successful!')
+                } else {
+                    alert(data.message || 'Login failed')
+                }
+            }
+            else if (state === "Sign Up") {
+                // Handle sign up
+                const formData = new FormData()
+                formData.append('name', name)
+                formData.append('email', email)
+                formData.append('password', password)
+                if (image) {
+                    formData.append('image', image)
+                }
+
+                const {data} = await axios.post(backendUrl + '/api/company/register', formData)
+                
+                if(data.success){
+                    setCompanyToken(data.token)
+                    setCompanyData(data.company)
+                    localStorage.setItem('companyToken', data.token)
+                    setShowRecruiterLogin(false)
+                    alert('Registration successful!')
+                } else {
+                    alert(data.message || 'Registration failed')
                 }
             }
         } catch (error) {
-            
+            console.error('Auth error:', error)
+            alert('Error: ' + (error.response?.data?.message || error.message))
         }
     }
 
@@ -73,12 +103,12 @@ const RecruiterLogin = () => {
 
                             <div className='border px-4 py-2 flex items-center gap-2 rounded-full mt-5'>
                                 <img src={assets.email_icon} alt="" />
-                                <input className='outline-none text-sm' onChange={e => setEmail(e.target.value)} value={email} placeholder='Email id' type="text" />
+                                <input className='outline-none text-sm' onChange={e => setEmail(e.target.value)} value={email} placeholder='Email id' type="email" required />
                             </div>
 
                             <div className='border px-4 py-2 flex items-center gap-2 rounded-full mt-5'>
                                 <img src={assets.lock_icon} alt="" />
-                                <input className='outline-none text-sm' onChange={e => setPassword(e.target.value)} value={password} placeholder='Password' type="password" />
+                                <input className='outline-none text-sm' onChange={e => setPassword(e.target.value)} value={password} placeholder='Password' type="password" required />
                             </div>
                         </>
                     )

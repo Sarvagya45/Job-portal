@@ -26,6 +26,14 @@ export const AppContextProvider = (props) =>{
         setJobs(jobsData)
     } 
 
+    // Load token from localStorage on app start
+    useEffect(() => {
+        const savedToken = localStorage.getItem('companyToken')
+        if (savedToken) {
+            setCompanyToken(savedToken)
+        }
+    }, [])
+
     useEffect(()=>{
         fetchJobs()
     },[])
