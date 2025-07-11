@@ -53,7 +53,7 @@ const AddJob = () => {
   }, [])
 
   return (
-    <form className='container flex p-4 flex-col w-full items-start gap-3'>
+    <form onSubmit={onSubmitHandler} className='container flex p-4 flex-col w-full items-start gap-3'>
 
       <div className='w-full'>
         <p className='mb-2'>Job Title</p>
