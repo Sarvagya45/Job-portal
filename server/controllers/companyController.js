@@ -3,6 +3,7 @@ import bcrypt from "bcrypt";
 import { v2 as cloudinary } from 'cloudinary';
 import generateToken from "../utils/generateToken.js";
 import Job from "../models/Job.js";
+import JobApplication from "../models/JobApplication.js"
 
 //register a new company
 export const registerCompany = async (req, resp) => {
@@ -122,9 +123,23 @@ export const postJob = async (req, resp) => {
     }
 }
 
-//get company job Application
-export const getCompanyJobApplication = async (req, resp) => {
+//get company job Applicants
+export const getCompanyJobApplicants = async (req, resp) => {
 
+    try {
+        
+        const companyId = req.company._id
+
+        const applications = await JobApplication.find({companyId})
+        .populate("userId","name image resume")
+        .populate("jobId","title location category level salary")
+        .exec()
+
+        return resp.json({success:true, applications})
+
+    } catch (error) {
+        return resp.json({success:false, message:error.message})
+    }
 
 }
 
@@ -137,9 +152,13 @@ export const getCompanyPostedJobs = async (req, resp) => {
 
         const jobs = await Job.find({ companyId })
 
-        //(Todo) adding no of applicant info in data
+        //adding no of applicant info in data
+        const jobsData = await Promise.all(jobs.map(async (job)=>{
+            const applicants = await JobApplication.find({jobId: job._id})
+            return {...job.toObject(),applicants:applicants.length}
+        }))
 
-        resp.json({ success: true, jobsData: jobs })
+        resp.json({ success: true, jobsData})
 
     } catch (error) {
         resp.json({ success: false, message: error.message })
@@ -150,6 +169,18 @@ export const getCompanyPostedJobs = async (req, resp) => {
 //change Job application status
 export const changeJobApplicationStatus = async (req, resp) => {
 
+    try {
+        
+        const { id, status } = req.body
+
+        //find Job Application and update status
+        await JobApplication.findByIdAndUpdate({_id:id},{status})
+
+        resp.json({success:true, message: "Status Changed"})
+
+    } catch (error) {
+        resp.json({success:false, message:error.message})
+    }
 }
 
 //change Job visibilty

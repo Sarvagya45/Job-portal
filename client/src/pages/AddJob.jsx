@@ -31,7 +31,7 @@ const AddJob = () => {
       )
 
       if(data.success){
-        toast.success(data.message)
+        toast.success("Successfully Posted a new job")
         setTitle("")
         setSalary(0)
         quillRef.current.root.innerHTML=""

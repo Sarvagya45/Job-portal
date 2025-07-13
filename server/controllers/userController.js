@@ -1,5 +1,6 @@
 import JobApplication from "../models/JobApplication.js"
 import User from "../models/User.js"
+import Job from "../models/Job.js"
 import { v2 as cloudinary } from "cloudinary";
 
 //get user data
@@ -44,7 +45,7 @@ export const applyForJob = async (req, resp) => {
         }
 
         await JobApplication.create({
-            comapnyId: jobData.comapnyId,
+            companyId: jobData.companyId,
             userId,
             jobId
         })
